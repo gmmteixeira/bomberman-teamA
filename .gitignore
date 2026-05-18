@@ -1,3 +1,6 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+
+# Per-user MCP overrides (see openspec/changes/setup-godot-mcp/)
+.mcp.local.json
