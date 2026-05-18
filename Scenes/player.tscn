@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://dgt4wnrar6u3x" path="res://Assets/Sprites.png" id="1_v0iea"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_olqyp"]
-radius = 5.34374
+radius = 16.0312
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_cvnsp"]
 atlas = ExtResource("1_v0iea")
@@ -161,7 +161,6 @@ animations = [{
 }]
 
 [node name="CharacterBody2D" type="CharacterBody2D" unique_id=1724918705]
-scale = Vector2(3, 3)
 motion_mode = 1
 script = ExtResource("1_cvnsp")
 
@@ -169,7 +168,13 @@ script = ExtResource("1_cvnsp")
 shape = SubResource("CircleShape2D_olqyp")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1014430511]
+scale = Vector2(3, 3)
 sprite_frames = SubResource("SpriteFrames_l6n3p")
 animation = &"down"
 autoplay = "down"
 frame_progress = 0.8534297
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1900859734]
+position_smoothing_enabled = true
+position_smoothing_speed = 8.0
+
