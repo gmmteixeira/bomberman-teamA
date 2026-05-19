@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://h77r6fac66ip"]
 
 [ext_resource type="Texture2D" uid="uid://dgt4wnrar6u3x" path="res://Assets/Sprites.png" id="1_yx723"]
-[ext_resource type="Script" path="res://Scripts/bomb.gd" id="2_bomb"]
+[ext_resource type="Script" uid="uid://dgfliyjvxs5fi" path="res://Scripts/bomb.gd" id="2_bomb"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_kdyat"]
 radius = 22.022715
@@ -35,9 +35,8 @@ animations = [{
 "speed": 5.0
 }]
 
-[node name="CharacterBody2D" type="CharacterBody2D" unique_id=704822614]
+[node name="CharacterBody2D2" type="CharacterBody2D" unique_id=704822614]
 collision_layer = 2
-collision_mask = 1
 script = ExtResource("2_bomb")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1700195349]
@@ -46,13 +45,12 @@ shape = SubResource("CircleShape2D_kdyat")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=240551641]
 scale = Vector2(3, 3)
 sprite_frames = SubResource("SpriteFrames_mkuqu")
+autoplay = "default"
 frame_progress = 0.79696006
 
-[node name="PlacerArea" type="Area2D" parent="."]
+[node name="PlacerArea" type="Area2D" parent="." unique_id=2018886039]
 collision_layer = 0
-collision_mask = 1
-monitoring = true
 monitorable = false
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PlacerArea"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlacerArea" unique_id=845299684]
 shape = SubResource("CircleShape2D_kdyat")
