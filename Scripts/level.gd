@@ -11,12 +11,14 @@ const SOURCE_ID := 0
 
 const WALL_SCENE := preload("res://Scenes/wall.tscn")
 const BOMB_SCENE := preload("res://Scenes/bomb.tscn")
+const EXPLOSION_SCENE := preload("res://Scenes/explosion.tscn")
 const SPAWN_SAFE_CELLS := [Vector2i(0, 0), Vector2i(1, 0), Vector2i(0, 1)]
 
 @onready var tile_map: TileMapLayer = $TileMapLayer
 @onready var player: CharacterBody2D = $CharacterBody2D
 
 var _bombs_by_cell: Dictionary = {}
+var _walls_by_cell: Dictionary = {}
 
 
 func _ready() -> void:
@@ -58,6 +60,8 @@ func _scatter_walls() -> void:
 			var wall := WALL_SCENE.instantiate()
 			wall.position = tile_map.transform * tile_map.map_to_local(cell)
 			add_child(wall)
+			_walls_by_cell[cell] = wall
+			wall.tree_exited.connect(func() -> void: _walls_by_cell.erase(cell))
 
 
 func _place_player() -> void:
@@ -77,3 +81,24 @@ func place_bomb_at_player(p: CharacterBody2D) -> void:
 	_bombs_by_cell[cell] = bomb
 	bomb.tree_exited.connect(func() -> void: _bombs_by_cell.erase(cell))
 	bomb.setup(p)
+
+
+func spawn_explosion(center_cell: Vector2i, power: int) -> void:
+	if center_cell.x < 0 or center_cell.x >= grid_width or center_cell.y < 0 or center_cell.y >= grid_height:
+		return
+	var explosion := EXPLOSION_SCENE.instantiate()
+	explosion.position = tile_map.transform * tile_map.map_to_local(center_cell)
+	add_child(explosion)
+	explosion.setup(self, center_cell, power)
+
+
+func cell_has_pillar(cell: Vector2i) -> bool:
+	return tile_map.get_cell_atlas_coords(cell) == SOLID_ATLAS
+
+
+func wall_at_cell(cell: Vector2i):
+	return _walls_by_cell.get(cell)
+
+
+func cell_in_bounds(cell: Vector2i) -> bool:
+	return cell.x >= 0 and cell.x < grid_width and cell.y >= 0 and cell.y < grid_height

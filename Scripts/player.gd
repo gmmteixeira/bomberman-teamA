@@ -6,8 +6,17 @@ extends CharacterBody2D
 @onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
 @onready var level: Node2D = get_parent()
 
+var _is_dead: bool = false
+
+
+func _ready() -> void:
+	add_to_group("players")
+
 
 func _physics_process(_delta: float) -> void:
+	if _is_dead:
+		return
+
 	var direction := Input.get_vector("left", "right", "up", "down")
 	velocity = direction * SPEED
 
@@ -23,3 +32,17 @@ func _physics_process(_delta: float) -> void:
 
 	if Input.is_action_just_pressed("bomb"):
 		level.place_bomb_at_player(self)
+
+
+func die() -> void:
+	if _is_dead:
+		return
+	_is_dead = true
+	print("player died")
+	velocity = Vector2.ZERO
+	animated_sprite_2d.animation_finished.connect(_on_die_finished, CONNECT_ONE_SHOT)
+	animated_sprite_2d.play("die")
+
+
+func _on_die_finished() -> void:
+	queue_free()

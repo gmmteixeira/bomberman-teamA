@@ -1,6 +1,7 @@
-[gd_scene format=3 uid="uid://b7xfiggym26c1"]
+[gd_scene load_steps=12 format=3 uid="uid://b7xfiggym26c1"]
 
 [ext_resource type="Texture2D" uid="uid://dgt4wnrar6u3x" path="res://Assets/Sprites.png" id="1_d155t"]
+[ext_resource type="Script" path="res://Scripts/wall.gd" id="2_wall"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_yjehn"]
 atlas = ExtResource("1_d155t")
@@ -54,7 +55,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_18a63")
 }],
-"loop": true,
+"loop": false,
 "name": &"break",
 "speed": 5.0
 }]
@@ -63,6 +64,7 @@ animations = [{
 size = Vector2(48, 48)
 
 [node name="wall" type="StaticBody2D" unique_id=655353452]
+script = ExtResource("2_wall")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=945067716]
 scale = Vector2(3, 3)

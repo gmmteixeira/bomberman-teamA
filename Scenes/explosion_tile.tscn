@@ -1,0 +1,143 @@
+[gd_scene format=3 uid="uid://bo0vox2jskmc1"]
+
+[ext_resource type="Texture2D" uid="uid://dgt4wnrar6u3x" path="res://Assets/Sprites.png" id="1_sheet"]
+[ext_resource type="Script" path="res://Scripts/explosion_tile.gd" id="2_script"]
+
+[sub_resource type="AtlasTexture" id="AT_center_0"]
+atlas = ExtResource("1_sheet")
+region = Rect2(32, 96, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AT_center_1"]
+atlas = ExtResource("1_sheet")
+region = Rect2(112, 96, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AT_center_2"]
+atlas = ExtResource("1_sheet")
+region = Rect2(192, 96, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AT_midh_0"]
+atlas = ExtResource("1_sheet")
+region = Rect2(16, 96, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AT_midh_1"]
+atlas = ExtResource("1_sheet")
+region = Rect2(96, 96, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AT_midh_2"]
+atlas = ExtResource("1_sheet")
+region = Rect2(176, 96, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AT_midv_0"]
+atlas = ExtResource("1_sheet")
+region = Rect2(32, 80, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AT_midv_1"]
+atlas = ExtResource("1_sheet")
+region = Rect2(112, 80, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AT_midv_2"]
+atlas = ExtResource("1_sheet")
+region = Rect2(192, 80, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AT_endu_0"]
+atlas = ExtResource("1_sheet")
+region = Rect2(32, 64, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AT_endu_1"]
+atlas = ExtResource("1_sheet")
+region = Rect2(112, 64, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AT_endu_2"]
+atlas = ExtResource("1_sheet")
+region = Rect2(192, 64, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AT_endd_0"]
+atlas = ExtResource("1_sheet")
+region = Rect2(32, 128, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AT_endd_1"]
+atlas = ExtResource("1_sheet")
+region = Rect2(112, 128, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AT_endd_2"]
+atlas = ExtResource("1_sheet")
+region = Rect2(192, 128, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AT_endl_0"]
+atlas = ExtResource("1_sheet")
+region = Rect2(0, 96, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AT_endl_1"]
+atlas = ExtResource("1_sheet")
+region = Rect2(80, 96, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AT_endl_2"]
+atlas = ExtResource("1_sheet")
+region = Rect2(160, 96, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AT_endr_0"]
+atlas = ExtResource("1_sheet")
+region = Rect2(64, 96, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AT_endr_1"]
+atlas = ExtResource("1_sheet")
+region = Rect2(144, 96, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AT_endr_2"]
+atlas = ExtResource("1_sheet")
+region = Rect2(224, 96, 16, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_explosion"]
+animations = [{
+"frames": [{"duration": 1.0, "texture": SubResource("AT_center_0")}, {"duration": 1.0, "texture": SubResource("AT_center_1")}, {"duration": 1.0, "texture": SubResource("AT_center_2")}],
+"loop": false,
+"name": &"center",
+"speed": 8.0
+}, {
+"frames": [{"duration": 1.0, "texture": SubResource("AT_midh_0")}, {"duration": 1.0, "texture": SubResource("AT_midh_1")}, {"duration": 1.0, "texture": SubResource("AT_midh_2")}],
+"loop": false,
+"name": &"mid_h",
+"speed": 8.0
+}, {
+"frames": [{"duration": 1.0, "texture": SubResource("AT_midv_0")}, {"duration": 1.0, "texture": SubResource("AT_midv_1")}, {"duration": 1.0, "texture": SubResource("AT_midv_2")}],
+"loop": false,
+"name": &"mid_v",
+"speed": 8.0
+}, {
+"frames": [{"duration": 1.0, "texture": SubResource("AT_endu_0")}, {"duration": 1.0, "texture": SubResource("AT_endu_1")}, {"duration": 1.0, "texture": SubResource("AT_endu_2")}],
+"loop": false,
+"name": &"end_u",
+"speed": 8.0
+}, {
+"frames": [{"duration": 1.0, "texture": SubResource("AT_endd_0")}, {"duration": 1.0, "texture": SubResource("AT_endd_1")}, {"duration": 1.0, "texture": SubResource("AT_endd_2")}],
+"loop": false,
+"name": &"end_d",
+"speed": 8.0
+}, {
+"frames": [{"duration": 1.0, "texture": SubResource("AT_endl_0")}, {"duration": 1.0, "texture": SubResource("AT_endl_1")}, {"duration": 1.0, "texture": SubResource("AT_endl_2")}],
+"loop": false,
+"name": &"end_l",
+"speed": 8.0
+}, {
+"frames": [{"duration": 1.0, "texture": SubResource("AT_endr_0")}, {"duration": 1.0, "texture": SubResource("AT_endr_1")}, {"duration": 1.0, "texture": SubResource("AT_endr_2")}],
+"loop": false,
+"name": &"end_r",
+"speed": 8.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tile"]
+size = Vector2(48, 48)
+
+[node name="ExplosionTile" type="Area2D"]
+collision_layer = 0
+collision_mask = 3
+monitorable = false
+script = ExtResource("2_script")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_tile")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+scale = Vector2(3, 3)
+sprite_frames = SubResource("SpriteFrames_explosion")
+animation = &"center"
