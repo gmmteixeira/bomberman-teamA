@@ -239,7 +239,9 @@ sources/0 = SubResource("TileSetAtlasSource_k5f4k")
 [node name="Level" type="Node2D" unique_id=1028599730]
 z_index = 1
 script = ExtResource("2_level")
-grid_width = 11
+grid_width = 15
+grid_height = 15
+wall_spawn_chance = 0.2
 
 [node name="CharacterBody2D" parent="." unique_id=1724918705 instance=ExtResource("1_k5f4k")]
 z_index = 1

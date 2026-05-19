@@ -161,6 +161,7 @@ animations = [{
 }]
 
 [node name="CharacterBody2D" type="CharacterBody2D" unique_id=1724918705]
+collision_mask = 3
 motion_mode = 1
 script = ExtResource("1_cvnsp")
 
