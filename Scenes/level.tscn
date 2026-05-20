@@ -2,6 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://cvfsg018fc104" path="res://Scenes/player.tscn" id="1_k5f4k"]
 [ext_resource type="Texture2D" uid="uid://clwcqc2u8vuvb" path="res://Assets/kloc.png" id="1_tumq0"]
+[ext_resource type="Texture2D" uid="uid://by6dje7myj7oa" path="res://Assets/catalyst.png" id="3_catal"]
 [ext_resource type="Script" uid="uid://bbq8jfcjqyw0b" path="res://Scripts/level.gd" id="2_level"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_k5f4k"]
@@ -16,10 +17,17 @@ texture_region_size = Vector2i(32, 32)
 0:1/animation_frame_3/duration = 1.0
 0:1/0 = 0
 
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_catal"]
+texture = ExtResource("3_catal")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
+
 [sub_resource type="TileSet" id="TileSet_6phgx"]
 tile_size = Vector2i(32, 32)
 physics_layer_0/collision_layer = 1
 sources/0 = SubResource("TileSetAtlasSource_k5f4k")
+sources/1 = SubResource("TileSetAtlasSource_catal")
 
 [node name="Level" type="Node2D" unique_id=1028599730]
 z_index = 1
@@ -30,6 +38,11 @@ wall_spawn_chance = 0.2
 
 [node name="CharacterBody2D" parent="." unique_id=1724918705 instance=ExtResource("1_k5f4k")]
 z_index = 1
+
+[node name="GroundLayer" type="TileMapLayer" parent="."]
+z_index = -1
+scale = Vector2(1.5, 1.5)
+tile_set = SubResource("TileSet_6phgx")
 
 [node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=55034948]
 scale = Vector2(1.5, 1.5)

@@ -9,6 +9,7 @@ extends Node2D
 const SOLID_ATLAS := Vector2i(0, 0)
 const EMPTY_ATLAS := Vector2i(0, 1)
 const SOURCE_ID := 0
+const SOLID_SOURCE_ID := 1
 
 const WALL_SCENE := preload("res://Scenes/wall.tscn")
 const BOMB_SCENE := preload("res://Scenes/bomb.tscn")
@@ -18,6 +19,7 @@ const POWERUP_SCRIPT := preload("res://Scripts/powerup.gd")
 const SPAWN_SAFE_CELLS := [Vector2i(0, 0), Vector2i(1, 0), Vector2i(0, 1)]
 
 @onready var tile_map: TileMapLayer = $TileMapLayer
+@onready var ground_map: TileMapLayer = $GroundLayer
 @onready var player: CharacterBody2D = $CharacterBody2D
 
 var _bombs_by_cell: Dictionary = {}
@@ -33,13 +35,21 @@ func _ready() -> void:
 
 func _generate_level() -> void:
 	tile_map.clear()
+	ground_map.clear()
+
+	# Lay an opaque ground tile across the whole arena (including under the
+	# perimeter and pillars) so the transparent catalyst wall art never reveals
+	# the level background behind it.
+	for y in range(-1, grid_height + 1):
+		for x in range(-1, grid_width + 1):
+			ground_map.set_cell(Vector2i(x, y), SOURCE_ID, EMPTY_ATLAS)
 
 	for x in range(-1, grid_width + 1):
-		tile_map.set_cell(Vector2i(x, -1), SOURCE_ID, SOLID_ATLAS)
-		tile_map.set_cell(Vector2i(x, grid_height), SOURCE_ID, SOLID_ATLAS)
+		tile_map.set_cell(Vector2i(x, -1), SOLID_SOURCE_ID, SOLID_ATLAS)
+		tile_map.set_cell(Vector2i(x, grid_height), SOLID_SOURCE_ID, SOLID_ATLAS)
 	for y in range(0, grid_height):
-		tile_map.set_cell(Vector2i(-1, y), SOURCE_ID, SOLID_ATLAS)
-		tile_map.set_cell(Vector2i(grid_width, y), SOURCE_ID, SOLID_ATLAS)
+		tile_map.set_cell(Vector2i(-1, y), SOLID_SOURCE_ID, SOLID_ATLAS)
+		tile_map.set_cell(Vector2i(grid_width, y), SOLID_SOURCE_ID, SOLID_ATLAS)
 
 	for iy in range(grid_height):
 		for ix in range(grid_width):
@@ -48,7 +58,8 @@ func _generate_level() -> void:
 			# for a literal every-other-tile alternation (brick pattern).
 			var is_pillar := ix % 2 == 1 and iy % 2 == 1
 			var atlas := SOLID_ATLAS if is_pillar else EMPTY_ATLAS
-			tile_map.set_cell(Vector2i(ix, iy), SOURCE_ID, atlas)
+			var source := SOLID_SOURCE_ID if is_pillar else SOURCE_ID
+			tile_map.set_cell(Vector2i(ix, iy), source, atlas)
 
 
 func _scatter_walls() -> void:
@@ -117,7 +128,7 @@ func spawn_explosion(center_cell: Vector2i, power: int) -> void:
 
 
 func cell_has_pillar(cell: Vector2i) -> bool:
-	return tile_map.get_cell_atlas_coords(cell) == SOLID_ATLAS
+	return tile_map.get_cell_source_id(cell) == SOLID_SOURCE_ID and tile_map.get_cell_atlas_coords(cell) == SOLID_ATLAS
 
 
 func wall_at_cell(cell: Vector2i):
