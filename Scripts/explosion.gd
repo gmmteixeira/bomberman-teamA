@@ -43,7 +43,8 @@ func _paint() -> void:
 func _walk_arm(direction: Vector2i, mid_anim: StringName, end_anim: StringName) -> void:
 	# Phase 1: walk the arm to discover which cells get painted.
 	# Stopping rules: out of bounds → stop, no paint; pillar → stop, no paint;
-	# wall → paint this cell (terminal), break wall, stop.
+	# wall → paint this cell (terminal), break wall, stop;
+	# power-up → paint this cell (terminal), stop (power-up is destroyed in Phase 2).
 	var reached: Array = []
 	for step in range(1, _power + 1):
 		var cell: Vector2i = _center_cell + direction * step
@@ -54,6 +55,8 @@ func _walk_arm(direction: Vector2i, mid_anim: StringName, end_anim: StringName) 
 		var wall = _level.wall_at_cell(cell)
 		reached.append({"cell": cell, "wall": wall})
 		if wall != null:
+			break
+		if _level.powerup_at_cell(cell) != null:
 			break
 
 	# Phase 2: paint. The LAST reached cell is always end_*; all others are mid_*.
