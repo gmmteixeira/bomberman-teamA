@@ -3,11 +3,13 @@ extends CharacterBody2D
 
 @export var SPEED = 125.0
 @export var power: int = 1
+@export var max_bombs: int = 1
 
 @onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
 @onready var level: Node2D = get_parent()
 
 var _is_dead: bool = false
+var _active_bombs: int = 0
 
 
 func _ready() -> void:
@@ -33,6 +35,18 @@ func _physics_process(_delta: float) -> void:
 
 	if Input.is_action_just_pressed("bomb"):
 		level.place_bomb_at_player(self)
+
+
+func can_place_bomb() -> bool:
+	return _active_bombs < max_bombs
+
+
+func register_bomb() -> void:
+	_active_bombs += 1
+
+
+func release_bomb() -> void:
+	_active_bombs = maxi(_active_bombs - 1, 0)
 
 
 func die() -> void:

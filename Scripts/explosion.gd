@@ -34,6 +34,7 @@ func _paint() -> void:
 	var center_tile := _spawn_tile(_center_cell, &"center", true)
 	if center_tile != null:
 		center_tile.get_sprite().animation_finished.connect(_on_center_finished, CONNECT_ONE_SHOT)
+	_destroy_powerup(_center_cell)
 
 	for arm in _ARMS:
 		_walk_arm(arm["dir"], arm["mid"], arm["end"])
@@ -61,9 +62,18 @@ func _walk_arm(direction: Vector2i, mid_anim: StringName, end_anim: StringName) 
 		var entry: Dictionary = reached[i]
 		var anim: StringName = end_anim if i == last_index else mid_anim
 		_spawn_tile(entry["cell"], anim, false)
+		# Destroy any pre-existing power-up before breaking the wall, so a power-up
+		# this same blast reveals (dropped by break_wall) survives.
+		_destroy_powerup(entry["cell"])
 		var wall = entry["wall"]
 		if wall != null and wall.has_method("break_wall"):
 			wall.break_wall()
+
+
+func _destroy_powerup(cell: Vector2i) -> void:
+	var powerup = _level.powerup_at_cell(cell)
+	if powerup != null:
+		powerup.queue_free()
 
 
 func _spawn_tile(cell: Vector2i, type: StringName, is_center: bool) -> Node:
