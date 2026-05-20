@@ -80,7 +80,7 @@ func place_bomb_at_player(p: CharacterBody2D) -> void:
 	add_child(bomb)
 	_bombs_by_cell[cell] = bomb
 	bomb.tree_exited.connect(func() -> void: _bombs_by_cell.erase(cell))
-	bomb.setup(p)
+	bomb.setup(p, p.power)
 
 
 func spawn_explosion(center_cell: Vector2i, power: int) -> void:

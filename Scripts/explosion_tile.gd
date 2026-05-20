@@ -24,8 +24,8 @@ func _check_initial_overlaps() -> void:
 		_on_body_entered(body)
 
 
-func setup(type: StringName, is_center: bool = false) -> void:
-	_is_center = is_center
+func setup(type: StringName, center: bool = false) -> void:
+	_is_center = center
 	animated_sprite.play(type)
 
 

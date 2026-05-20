@@ -2,7 +2,8 @@ extends CharacterBody2D
 
 
 @export var lifetime: float = 3.0
-@export var power: int = 1
+
+var power: int = 1
 
 const _MIN_LIFETIME: float = 0.05
 
@@ -21,8 +22,9 @@ func _ready() -> void:
 	_lifetime_timer.timeout.connect(_detonate, CONNECT_ONE_SHOT)
 
 
-func setup(placer: CharacterBody2D) -> void:
+func setup(placer: CharacterBody2D, bomb_power: int = 1) -> void:
 	_placer = placer
+	power = bomb_power
 	add_collision_exception_with(placer)
 
 

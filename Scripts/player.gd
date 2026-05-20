@@ -2,6 +2,7 @@ extends CharacterBody2D
 
 
 @export var SPEED = 125.0
+@export var power: int = 1
 
 @onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
 @onready var level: Node2D = get_parent()
