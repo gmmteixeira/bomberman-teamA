@@ -79,10 +79,12 @@ func _spawn_tile(cell: Vector2i, type: StringName, is_center: bool) -> Node:
 func _on_flame_hit(body: Node2D) -> void:
 	if body == null:
 		return
+	# Deferred: this runs from body_entered during physics query flushing, and a
+	# chain detonation spawns new Area2D flame tiles, which cannot be added mid-flush.
 	if body.is_in_group("bombs") or body.has_method("detonate_now"):
-		body.detonate_now()
+		body.detonate_now.call_deferred()
 	elif body.is_in_group("players") or body.has_method("die"):
-		body.die()
+		body.die.call_deferred()
 
 
 func _on_center_finished() -> void:
