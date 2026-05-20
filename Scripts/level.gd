@@ -6,8 +6,8 @@ extends Node2D
 @export_range(0.0, 1.0, 0.05) var wall_spawn_chance: float = 0.5
 @export_range(0.0, 1.0, 0.05) var powerup_spawn_chance: float = 0.3
 
-const SOLID_ATLAS := Vector2i(3, 3)
-const EMPTY_ATLAS := Vector2i(13, 0)
+const SOLID_ATLAS := Vector2i(0, 0)
+const EMPTY_ATLAS := Vector2i(0, 1)
 const SOURCE_ID := 0
 
 const WALL_SCENE := preload("res://Scenes/wall.tscn")
