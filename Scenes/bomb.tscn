@@ -1,22 +1,22 @@
 [gd_scene format=3 uid="uid://h77r6fac66ip"]
 
-[ext_resource type="Texture2D" uid="uid://dgt4wnrar6u3x" path="res://Assets/Sprites.png" id="1_yx723"]
 [ext_resource type="Script" uid="uid://dgfliyjvxs5fi" path="res://Scripts/bomb.gd" id="2_bomb"]
+[ext_resource type="Texture2D" uid="uid://dkq1kysymef4m" path="res://Assets/bouba.png" id="2_kdyat"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_kdyat"]
 radius = 22.022715
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_2fiif"]
-atlas = ExtResource("1_yx723")
-region = Rect2(0, 48, 16, 16)
+atlas = ExtResource("2_kdyat")
+region = Rect2(0, 0, 32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_60xmw"]
-atlas = ExtResource("1_yx723")
-region = Rect2(16, 48, 16, 16)
+atlas = ExtResource("2_kdyat")
+region = Rect2(32, 0, 32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_l8kb1"]
-atlas = ExtResource("1_yx723")
-region = Rect2(32, 48, 16, 16)
+atlas = ExtResource("2_kdyat")
+region = Rect2(64, 0, 32, 32)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_mkuqu"]
 animations = [{
@@ -43,7 +43,7 @@ script = ExtResource("2_bomb")
 shape = SubResource("CircleShape2D_kdyat")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=240551641]
-scale = Vector2(3, 3)
+scale = Vector2(1.3, 1.3)
 sprite_frames = SubResource("SpriteFrames_mkuqu")
 autoplay = "default"
 frame_progress = 0.79696006

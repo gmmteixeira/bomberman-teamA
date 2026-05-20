@@ -1,7 +1,77 @@
-[gd_scene format=3 uid="uid://dbp3wq8m5n2yk"]
+[gd_scene load_steps=14 format=3 uid="uid://dbp3wq8m5n2yk"]
 
-[ext_resource type="Texture2D" uid="uid://1j0xn8ahwytu" path="res://Assets/PowerUpFireUp.png" id="1_fireup"]
-[ext_resource type="Script" path="res://Scripts/powerup.gd" id="2_powerup"]
+[ext_resource type="Texture2D" uid="uid://cy8wukx5jof0l" path="res://Assets/powerfire.png" id="1_fire"]
+[ext_resource type="Texture2D" uid="uid://v6qbyw5usl27" path="res://Assets/powerbomb.png" id="2_bomb"]
+[ext_resource type="Script" path="res://Scripts/powerup.gd" id="3_powerup"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fire0"]
+atlas = ExtResource("1_fire")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fire1"]
+atlas = ExtResource("1_fire")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fire2"]
+atlas = ExtResource("1_fire")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fire3"]
+atlas = ExtResource("1_fire")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bomb0"]
+atlas = ExtResource("2_bomb")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bomb1"]
+atlas = ExtResource("2_bomb")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bomb2"]
+atlas = ExtResource("2_bomb")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bomb3"]
+atlas = ExtResource("2_bomb")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_powerup"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bomb0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bomb1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bomb2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bomb3")
+}],
+"loop": true,
+"name": &"bomb",
+"speed": 7.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fire0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fire1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fire2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fire3")
+}],
+"loop": true,
+"name": &"fire",
+"speed": 7.0
+}]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_powerup"]
 size = Vector2(48, 48)
@@ -10,11 +80,13 @@ size = Vector2(48, 48)
 collision_layer = 0
 collision_mask = 1
 monitorable = false
-script = ExtResource("2_powerup")
+script = ExtResource("3_powerup")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
-scale = Vector2(3, 3)
-texture = ExtResource("1_fireup")
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+scale = Vector2(1.5, 1.5)
+sprite_frames = SubResource("SpriteFrames_powerup")
+animation = &"fire"
+autoplay = "fire"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_powerup")
