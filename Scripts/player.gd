@@ -8,7 +8,13 @@ extends CharacterBody2D
 @onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
 @onready var level: Node2D = get_parent()
 
+# Alpha-blink rate used during the level-completion pause.
+const _COMPLETE_BLINK_INTERVAL := 0.15
+
 var _is_dead: bool = false
+# Set while the level-completion pause runs: gameplay input/movement is halted but
+# the node keeps processing (PROCESS_MODE_ALWAYS) so its blink tween can animate.
+var _frozen: bool = false
 var _active_bombs: int = 0
 
 
@@ -17,7 +23,7 @@ func _ready() -> void:
 
 
 func _physics_process(_delta: float) -> void:
-	if _is_dead:
+	if _is_dead or _frozen:
 		return
 
 	var direction := Input.get_vector("left", "right", "up", "down")
@@ -47,6 +53,20 @@ func register_bomb() -> void:
 
 func release_bomb() -> void:
 	_active_bombs = maxi(_active_bombs - 1, 0)
+
+
+func blink() -> void:
+	# Called by the level during the completion pause. The SceneTree is paused, so
+	# switch to ALWAYS process mode (a tween bound to this node would otherwise be
+	# frozen with the tree) and freeze gameplay explicitly, since ALWAYS would keep
+	# _physics_process running. The tween blinks the sprite's alpha until reload.
+	_frozen = true
+	velocity = Vector2.ZERO
+	animated_sprite_2d.stop()
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	var tween := create_tween().set_loops()
+	tween.tween_property(animated_sprite_2d, "modulate:a", 0.0, _COMPLETE_BLINK_INTERVAL)
+	tween.tween_property(animated_sprite_2d, "modulate:a", 1.0, _COMPLETE_BLINK_INTERVAL)
 
 
 func die() -> void:

@@ -25,6 +25,8 @@ const DOOR_SCENE := preload("res://Scenes/door.tscn")
 const SPAWN_SAFE_CELLS := [Vector2i(0, 0), Vector2i(1, 0), Vector2i(0, 1)]
 # Keep enemies a few tiles away from the player's spawn corner (0, 0).
 const ENEMY_SPAWN_MIN_DISTANCE := 3
+# On door completion, freeze the whole game for this long before reloading.
+const COMPLETE_PAUSE_SECONDS := 2.0
 
 @onready var tile_map: TileMapLayer = $TileMapLayer
 @onready var ground_map: TileMapLayer = $GroundLayer
@@ -211,8 +213,24 @@ func _on_enemy_removed() -> void:
 
 
 func complete_level() -> void:
-	# No further levels yet, so completing simply restarts the current one.
-	restart_level()
+	# Door win path: freeze everything for COMPLETE_PAUSE_SECONDS, then reload.
+	# Shares the _completing guard with restart_level(), so a death during the
+	# pause hits restart_level()'s early return — no double reload.
+	if _completing:
+		return
+	_completing = true
+	get_tree().paused = true
+	# Blink the player during the freeze; it processes in ALWAYS mode so its tween
+	# animates while everything else is paused.
+	if is_instance_valid(player) and player.has_method("blink"):
+		player.blink()
+	# create_timer defaults process_always = true, so the timer keeps counting
+	# while the tree is paused; without it the wait would freeze too.
+	await get_tree().create_timer(COMPLETE_PAUSE_SECONDS).timeout
+	# SceneTree.paused is a tree-level flag that survives reload_current_scene(),
+	# so it must be cleared or the restarted level would start frozen.
+	get_tree().paused = false
+	get_tree().reload_current_scene()
 
 
 func restart_level() -> void:

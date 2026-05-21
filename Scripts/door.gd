@@ -15,6 +15,9 @@ const _DISABLED_ALPHA := 0.4
 # A destroyed door blinks between these alphas and spawns one enemy per interval.
 const _BLINK_INTERVAL := 0.25
 const _SPAWN_INTERVAL := 2.0
+# Completion fires only when the player's center is within this distance of the
+# door center — "more or less inside" the 48px tile, not on first edge overlap.
+const ENTER_RADIUS := 12.0
 
 @onready var sprite: Sprite2D = $Sprite2D
 
@@ -26,8 +29,25 @@ var _destroyed: bool = false
 
 
 func _ready() -> void:
-	body_entered.connect(_on_body_entered)
 	_apply_state()
+
+
+func _physics_process(_delta: float) -> void:
+	# Completion fires only when a player is more or less inside the tile — its
+	# center within ENTER_RADIUS of the door center — not on first edge overlap.
+	# A destroyed door stays a usable exit, so completion is allowed when enabled
+	# OR destroyed. Polling each frame also covers a player already centered when
+	# the door enables / is destroyed (no fresh overlap event needed).
+	if _completed:
+		return
+	if not (enabled or _destroyed):
+		return
+	for body in get_overlapping_bodies():
+		if not body.is_in_group("players"):
+			continue
+		if global_position.distance_to(body.global_position) <= ENTER_RADIUS:
+			_complete()
+			return
 
 
 func enable() -> void:
@@ -37,12 +57,6 @@ func enable() -> void:
 		return
 	enabled = true
 	_apply_state()
-	# A player already standing on the door when it unlocks won't re-fire
-	# body_entered, so complete now for any player already overlapping it.
-	for body in get_overlapping_bodies():
-		if body.is_in_group("players"):
-			_complete()
-			return
 
 
 func destroy() -> void:
@@ -54,12 +68,6 @@ func destroy() -> void:
 	enabled = false
 	_start_blink()
 	_start_spawning()
-	# A player already standing on the door when it is destroyed won't re-fire
-	# body_entered, so complete now for any player already overlapping it.
-	for body in get_overlapping_bodies():
-		if body.is_in_group("players"):
-			_complete()
-			return
 
 
 func _start_blink() -> void:
@@ -89,16 +97,6 @@ func _on_spawn_timer_timeout() -> void:
 
 func _apply_state() -> void:
 	sprite.modulate.a = 1.0 if enabled else _DISABLED_ALPHA
-
-
-func _on_body_entered(body: Node2D) -> void:
-	# A destroyed door is still a usable exit even though it never becomes the
-	# opaque "enabled" door, so completion is allowed when enabled OR destroyed.
-	if not (enabled or _destroyed):
-		return
-	if not body.is_in_group("players"):
-		return
-	_complete()
 
 
 func _complete() -> void:
