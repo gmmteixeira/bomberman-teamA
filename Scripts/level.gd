@@ -5,6 +5,7 @@ extends Node2D
 @export var grid_height: int = 11
 @export_range(0.0, 1.0, 0.05) var wall_spawn_chance: float = 0.5
 @export_range(0.0, 1.0, 0.05) var powerup_spawn_chance: float = 0.3
+@export var enemy_count: int = 3
 
 const SOLID_ATLAS := Vector2i(0, 0)
 const EMPTY_ATLAS := Vector2i(0, 1)
@@ -16,7 +17,10 @@ const BOMB_SCENE := preload("res://Scenes/bomb.tscn")
 const EXPLOSION_SCENE := preload("res://Scenes/explosion.tscn")
 const POWERUP_SCENE := preload("res://Scenes/powerup.tscn")
 const POWERUP_SCRIPT := preload("res://Scripts/powerup.gd")
+const ENEMY_SCENE := preload("res://Scenes/enemy_balloom.tscn")
 const SPAWN_SAFE_CELLS := [Vector2i(0, 0), Vector2i(1, 0), Vector2i(0, 1)]
+# Keep enemies a few tiles away from the player's spawn corner (0, 0).
+const ENEMY_SPAWN_MIN_DISTANCE := 3
 
 @onready var tile_map: TileMapLayer = $TileMapLayer
 @onready var ground_map: TileMapLayer = $GroundLayer
@@ -31,6 +35,7 @@ func _ready() -> void:
 	_generate_level()
 	_scatter_walls()
 	_place_player()
+	_spawn_enemies()
 
 
 func _generate_level() -> void:
@@ -85,6 +90,42 @@ func _place_player() -> void:
 	player.position = tile_map.transform * local_pos
 
 
+func _spawn_enemies() -> void:
+	# Gather floor cells clear of pillars, breakable walls, and the player's
+	# spawn corner, keeping only cells that have at least one open neighbour so a
+	# Balloom never spawns fully boxed in.
+	var candidates: Array = []
+	for iy in range(grid_height):
+		for ix in range(grid_width):
+			var cell := Vector2i(ix, iy)
+			if cell in SPAWN_SAFE_CELLS:
+				continue
+			if cell.x + cell.y < ENEMY_SPAWN_MIN_DISTANCE:
+				continue
+			if cell_has_pillar(cell):
+				continue
+			if _walls_by_cell.has(cell):
+				continue
+			if not _has_open_neighbor(cell):
+				continue
+			candidates.append(cell)
+
+	candidates.shuffle()
+	for i in range(mini(enemy_count, candidates.size())):
+		var cell: Vector2i = candidates[i]
+		var enemy := ENEMY_SCENE.instantiate()
+		enemy.position = tile_map.transform * tile_map.map_to_local(cell)
+		add_child(enemy)
+
+
+func _has_open_neighbor(cell: Vector2i) -> bool:
+	for dir: Vector2i in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+		var neighbor: Vector2i = cell + dir
+		if cell_in_bounds(neighbor) and not cell_has_pillar(neighbor) and not _walls_by_cell.has(neighbor):
+			return true
+	return false
+
+
 func place_bomb_at_player(p: CharacterBody2D) -> void:
 	var cell: Vector2i = tile_map.local_to_map(tile_map.to_local(p.global_position))
 	if cell.x < 0 or cell.x >= grid_width or cell.y < 0 or cell.y >= grid_height:
@@ -133,6 +174,10 @@ func cell_has_pillar(cell: Vector2i) -> bool:
 
 func wall_at_cell(cell: Vector2i):
 	return _walls_by_cell.get(cell)
+
+
+func bomb_at_cell(cell: Vector2i):
+	return _bombs_by_cell.get(cell)
 
 
 func powerup_at_cell(cell: Vector2i):

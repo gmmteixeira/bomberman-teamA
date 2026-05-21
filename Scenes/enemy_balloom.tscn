@@ -1,0 +1,114 @@
+[gd_scene format=3 uid="uid://kac2mj4wy8lg"]
+
+[ext_resource type="Texture2D" uid="uid://dgt4wnrar6u3x" path="res://Assets/Sprites.png" id="1_sheet"]
+[ext_resource type="Script" uid="uid://c6ojjn5byd51m" path="res://Scripts/enemy_balloom.gd" id="2_script"]
+
+[sub_resource type="AtlasTexture" id="AT_d0"]
+atlas = ExtResource("1_sheet")
+region = Rect2(96, 240, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AT_d1"]
+atlas = ExtResource("1_sheet")
+region = Rect2(112, 240, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AT_d2"]
+atlas = ExtResource("1_sheet")
+region = Rect2(128, 240, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AT_wl0"]
+atlas = ExtResource("1_sheet")
+region = Rect2(48, 240, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AT_wl1"]
+atlas = ExtResource("1_sheet")
+region = Rect2(64, 240, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AT_wl2"]
+atlas = ExtResource("1_sheet")
+region = Rect2(80, 240, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AT_wr0"]
+atlas = ExtResource("1_sheet")
+region = Rect2(0, 240, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AT_wr1"]
+atlas = ExtResource("1_sheet")
+region = Rect2(16, 240, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AT_wr2"]
+atlas = ExtResource("1_sheet")
+region = Rect2(32, 240, 16, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_balloom"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AT_d0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AT_d1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AT_d2")
+}],
+"loop": false,
+"name": &"die",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AT_wl0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AT_wl1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AT_wl2")
+}],
+"loop": true,
+"name": &"walk_left",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AT_wr0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AT_wr1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AT_wr2")
+}],
+"loop": true,
+"name": &"walk_right",
+"speed": 6.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_body"]
+radius = 16.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hurt"]
+radius = 18.0
+
+[node name="Balloom" type="CharacterBody2D" unique_id=739151267]
+z_index = 1
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("2_script")
+speed = 40.0
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=807814072]
+scale = Vector2(2.5, 2.5)
+sprite_frames = SubResource("SpriteFrames_balloom")
+animation = &"walk_right"
+autoplay = "walk_right"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=812273313]
+shape = SubResource("CircleShape2D_body")
+
+[node name="HurtArea" type="Area2D" parent="." unique_id=2112049642]
+collision_layer = 0
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtArea" unique_id=567579064]
+shape = SubResource("CircleShape2D_hurt")
