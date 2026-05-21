@@ -18,6 +18,10 @@ const EXPLOSION_SCENE := preload("res://Scenes/explosion.tscn")
 const POWERUP_SCENE := preload("res://Scenes/powerup.tscn")
 const POWERUP_SCRIPT := preload("res://Scripts/powerup.gd")
 const ENEMY_SCENE := preload("res://Scenes/enemy_balloom.tscn")
+# Enemy types a destroyed door may spawn. Only one type exists today; a destroyed
+# door picks at random from this list, so adding enemy types needs no door change.
+const ENEMY_SCENES := [ENEMY_SCENE]
+const DOOR_SCENE := preload("res://Scenes/door.tscn")
 const SPAWN_SAFE_CELLS := [Vector2i(0, 0), Vector2i(1, 0), Vector2i(0, 1)]
 # Keep enemies a few tiles away from the player's spawn corner (0, 0).
 const ENEMY_SPAWN_MIN_DISTANCE := 3
@@ -30,12 +34,25 @@ var _bombs_by_cell: Dictionary = {}
 var _walls_by_cell: Dictionary = {}
 var _powerups_by_cell: Dictionary = {}
 
+# Exit door: one breakable wall hides the door (_door_cell). Breaking it spawns
+# the door (_door). The door stays disabled until every enemy is cleared.
+var _door_cell = null
+var _door = null
+var _live_enemies: int = 0
+var _enemies_cleared: bool = false
+var _completing: bool = false
+
 
 func _ready() -> void:
 	_generate_level()
 	_scatter_walls()
+	_designate_door_cell()
 	_place_player()
 	_spawn_enemies()
+	# A level configured with no enemies is "cleared" from the start, so a door
+	# revealed later spawns already enabled.
+	if _live_enemies == 0:
+		_enemies_cleared = true
 
 
 func _generate_level() -> void:
@@ -77,12 +94,63 @@ func _scatter_walls() -> void:
 				continue
 			if randf() >= wall_spawn_chance:
 				continue
-			var wall := WALL_SCENE.instantiate()
-			wall.position = tile_map.transform * tile_map.map_to_local(cell)
-			add_child(wall)
-			_walls_by_cell[cell] = wall
-			wall.tree_exited.connect(func() -> void: _walls_by_cell.erase(cell))
-			wall.broke.connect(func() -> void: _try_drop_powerup(cell))
+			_spawn_wall(cell)
+
+
+func _spawn_wall(cell: Vector2i) -> void:
+	var wall := WALL_SCENE.instantiate()
+	wall.position = tile_map.transform * tile_map.map_to_local(cell)
+	add_child(wall)
+	_walls_by_cell[cell] = wall
+	wall.tree_exited.connect(func() -> void: _walls_by_cell.erase(cell))
+	wall.broke.connect(func() -> void: _on_wall_broke(cell))
+
+
+func _designate_door_cell() -> void:
+	# Exactly one breakable wall hides the exit door. If generation produced no
+	# walls, force one onto an eligible cell so the door always exists.
+	if _walls_by_cell.is_empty():
+		_force_place_host_wall()
+	if _walls_by_cell.is_empty():
+		return
+	var cells: Array = _walls_by_cell.keys()
+	_door_cell = cells[randi() % cells.size()]
+
+
+func _force_place_host_wall() -> void:
+	var candidates: Array = []
+	for iy in range(grid_height):
+		for ix in range(grid_width):
+			if ix % 2 == 1 and iy % 2 == 1:
+				continue
+			var cell := Vector2i(ix, iy)
+			if cell in SPAWN_SAFE_CELLS:
+				continue
+			candidates.append(cell)
+	if candidates.is_empty():
+		return
+	_spawn_wall(candidates[randi() % candidates.size()])
+
+
+func _on_wall_broke(cell: Vector2i) -> void:
+	# The door's host wall reveals the door instead of dropping a power-up.
+	if _door_cell != null and cell == _door_cell:
+		_spawn_door(cell)
+	else:
+		_try_drop_powerup(cell)
+
+
+func _spawn_door(cell: Vector2i) -> void:
+	if _door != null:
+		return
+	var door := DOOR_SCENE.instantiate()
+	door.position = tile_map.transform * tile_map.map_to_local(cell)
+	add_child(door)
+	_door = door
+	door.tree_exited.connect(func() -> void: _door = null)
+	# Door revealed after the last enemy is gone opens immediately.
+	if _enemies_cleared:
+		door.enable()
 
 
 func _place_player() -> void:
@@ -112,10 +180,48 @@ func _spawn_enemies() -> void:
 
 	candidates.shuffle()
 	for i in range(mini(enemy_count, candidates.size())):
-		var cell: Vector2i = candidates[i]
-		var enemy := ENEMY_SCENE.instantiate()
-		enemy.position = tile_map.transform * tile_map.map_to_local(cell)
-		add_child(enemy)
+		_spawn_enemy_at(candidates[i])
+
+
+func _spawn_enemy_at(cell: Vector2i, scene: PackedScene = ENEMY_SCENE) -> void:
+	var enemy := scene.instantiate()
+	enemy.position = tile_map.transform * tile_map.map_to_local(cell)
+	add_child(enemy)
+	_live_enemies += 1
+	enemy.tree_exited.connect(_on_enemy_removed)
+
+
+func spawn_random_enemy(cell: Vector2i) -> void:
+	# Called by a destroyed door to flood the level. Picks a random enemy type
+	# from ENEMY_SCENES and spawns it on the given cell, tracked like any other
+	# enemy via _spawn_enemy_at.
+	var scene: PackedScene = ENEMY_SCENES[randi() % ENEMY_SCENES.size()]
+	_spawn_enemy_at(cell, scene)
+
+
+func _on_enemy_removed() -> void:
+	_live_enemies -= 1
+	if _live_enemies <= 0:
+		_live_enemies = 0
+		_enemies_cleared = true
+		# Last enemy gone: open an already-revealed door. Guard against teardown,
+		# where an enemy's tree_exited can fire after the door is freed.
+		if is_instance_valid(_door):
+			_door.enable()
+
+
+func complete_level() -> void:
+	# No further levels yet, so completing simply restarts the current one.
+	restart_level()
+
+
+func restart_level() -> void:
+	# Single entry point for reloading the level — used both when the player wins
+	# (door) and when the player dies. Guarded so it fires at most once.
+	if _completing:
+		return
+	_completing = true
+	get_tree().reload_current_scene()
 
 
 func _has_open_neighbor(cell: Vector2i) -> bool:
@@ -174,6 +280,15 @@ func cell_has_pillar(cell: Vector2i) -> bool:
 
 func wall_at_cell(cell: Vector2i):
 	return _walls_by_cell.get(cell)
+
+
+func door_at_cell(cell: Vector2i):
+	# Returns the spawned door if it occupies this cell, even when destroyed, so a
+	# blast always terminates at the door's cell. The door's destroy() is
+	# idempotent, so re-hitting an already-destroyed door is harmless.
+	if _door_cell != null and cell == _door_cell and is_instance_valid(_door):
+		return _door
+	return null
 
 
 func bomb_at_cell(cell: Vector2i):

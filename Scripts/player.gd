@@ -60,4 +60,9 @@ func die() -> void:
 
 
 func _on_die_finished() -> void:
-	queue_free()
+	# Death restarts the level (no lives / further levels yet). Reloading replaces
+	# the whole scene, so the player node is removed as part of the restart.
+	if is_instance_valid(level) and level.has_method("restart_level"):
+		level.restart_level()
+	else:
+		get_tree().reload_current_scene()

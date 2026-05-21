@@ -53,8 +53,13 @@ func _walk_arm(direction: Vector2i, mid_anim: StringName, end_anim: StringName) 
 		if _level.cell_has_pillar(cell):
 			break
 		var wall = _level.wall_at_cell(cell)
-		reached.append({"cell": cell, "wall": wall})
+		var door = _level.door_at_cell(cell)
+		reached.append({"cell": cell, "wall": wall, "door": door})
 		if wall != null:
+			break
+		# A door blocks the arm like a wall (terminal cell, no cells beyond), even
+		# when already destroyed — a destroyed door persists as an enemy spawner.
+		if door != null:
 			break
 		if _level.powerup_at_cell(cell) != null:
 			break
@@ -71,6 +76,11 @@ func _walk_arm(direction: Vector2i, mid_anim: StringName, end_anim: StringName) 
 		var wall = entry["wall"]
 		if wall != null and wall.has_method("break_wall"):
 			wall.break_wall()
+		# Destroying the door is idempotent, so an already-destroyed door (which
+		# still terminated this arm) is not re-destroyed or removed.
+		var door = entry["door"]
+		if door != null and door.has_method("destroy"):
+			door.destroy()
 
 
 func _destroy_powerup(cell: Vector2i) -> void:
